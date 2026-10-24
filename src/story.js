@@ -97,7 +97,7 @@ const TILE_TALK = {
   tv: ['A huge TV. Someone left the deployment dashboard on. All green.', 'The TV. On Fridays it shows the pinball high scores.'],
   cabinet: 'Kitchen counter. Mugs with team logos and a suspicious number of spoons.',
   toilet: 'A toilet. Spotless. Facilities is on top of things.',
-  books: ['Bookshelf: "Clean Code", "The Phoenix Project", "Accelerate" and a well-thumbed "Team Topologies".', 'Bookshelf: "Designing Data-Intensive Applications", still in its plastic wrap. Very aspirational.', 'Bookshelf: a <company> manual from 2009, a Dutch-Hungarian dictionary and a board game with half the pieces missing.', 'Bookshelf: "Kubernetes Up and Running". Someone added a sticky note: "or one command, just saying".'],
+  books: ['Bookshelf: "Clean Code", "The Phoenix Project", "Accelerate" and a well-thumbed "Team Topologies".', 'Bookshelf: "Designing Data-Intensive Applications", still in its plastic wrap. Very aspirational.', 'Bookshelf: a <company> manual from 2009, an English-Hungarian dictionary and a board game with half the pieces missing.', 'Bookshelf: "Kubernetes Up and Running". Someone added a sticky note: "or one command, just saying".'],
   sink: 'A sink with the good soap. Somebody wrote "wash hands, then push" on the mirror.',
   massage: 'The massage table. There is a waiting list until next quarter.',
   server: 'The server room hums behind the wall. Blinking lights. Do not touch.',
@@ -112,10 +112,10 @@ const TILE_TALK = {
 
 export const TALK = {
   // ---- street --------------------------------------------------------------
-  passerby: ['Passerby: <company>? Corvin Innovation Campus, this building, 3rd floor.', 'Walk through the front garden to the big glass doors at the back of the U.', 'Oh, and say hi to the fountain. Everyone does.'],
-  entrance: 'MAIN ENTRANCE - Corvin Innovation Campus. This is the one.',
+  passerby: ['Passerby: <company>? Riverside Innovation Park, this building, 3rd floor.', 'Walk through the front garden to the big glass doors at the back of the U.', 'Oh, and say hi to the fountain. Everyone does.'],
+  entrance: 'MAIN ENTRANCE - Riverside Innovation Park. This is the one.',
   signCompany: '<company> - 3rd floor. Welcome to your first day!',
-  signMain: 'CORVIN INNOVATION CAMPUS - main entrance at the back of the U\nIBM Hungary: 5th floor\nTurbine: 2nd floor\n<company>: 3rd floor',
+  signMain: 'RIVERSIDE INNOVATION PARK - main entrance at the back of the U\nHelix Labs: 5th floor\nPixel Forge: 2nd floor\n<company>: 3rd floor',
   // Hands you one spare for the bench smoker, once he has hinted at it.
   smoker1: async (g) => {
     if (flags.cigarette === 'given' && !flags.spare) {
@@ -145,7 +145,7 @@ export const TALK = {
   },
   smoker2: (g) => g.say(pick(['Developer: Five minute break. Pipeline takes twelve. Maths.', 'Developer: <company> is on the third floor. Bring a badge, the guards love paperwork.'])),
   smoker3: (g) => g.say(pick(['Finance: Not smoking. Just standing near smokers. Social networking.', 'Finance: Rumour has it DevEx sets up a laptop in under ten minutes. I will believe it when I see it.'])),
-  metro: 'M3 Klinikák. The metro you just came from. No turning back now.',
+  metro: 'The metro you just came from. No turning back now.',
 
   // ---- lobby ---------------------------------------------------------------
   securityDesk: async (g) => {
@@ -178,7 +178,7 @@ export const TALK = {
 
   // ---- elevators, ground floor ---------------------------------------------
   liftA: (g) => g.say(flags.badge ? 'Elevator A. Closed. The call panel decides which elevator you get.' : 'Elevator A, behind the rails. You need a badge first.'),
-  liftC: 'Elevator C. Closed. It is taking the IBM crowd to the 5th floor.',
+  liftC: 'Elevator C. Closed. It is taking the Helix Labs crowd to the 5th floor.',
   liftD: 'Elevator D. Closed. Out of order? No, just shy.',
   liftB: (g) => g.say(flags.puzzle ? 'Elevator B. The doors are open. Just walk in.' : 'Elevator B. Closed. Ask the call panel first.'),
 };
@@ -240,7 +240,7 @@ Object.assign(TALK, {
     hrPickup(g);
   },
   receptionist: (g) => TALK.receptionDesk(g),
-  tourist: 'Tourist: Is this the way to the Corvin Plaza? ...the office building? Oh. Sorry.',
+  tourist: 'Tourist: Is this the way to the shopping centre? ...the office building? Oh. Sorry.',
   itDesk: async (g) => {
     if (flags.laptop) return g.say(`IT: Take care of that ${flags.laptop}. And go find DevEx: north end of the open office, the corner with all the monitors.`);
     if (!flags.checkedIn) return g.say('IT: Did reception sign you in? Do that first, I need your name in the system.');
@@ -322,8 +322,8 @@ Object.assign(TALK, {
 // ---- office chatter: corporate lingo, AI hype, local clusters, asset management, reporting ----
 const R = (...lines) => random(...lines);
 Object.assign(TALK, {
-  // Pod 8: recruiters next to DevEx
-  // Pod 7: developers and HR
+  // North-west: recruiters next to DevEx
+  // North: developers and HR
   pod7: R(
     'Developer: We sit next to DevEx, so our builds stay green out of fear.',
     'Developer: I asked the AI assistant to write my unit tests. It asked me what the code is supposed to do. Fair question, honestly.',
@@ -343,9 +343,9 @@ Object.assign(TALK, {
     'HR: I am waiting for a candidate. The recruiters promised them a tour by "the person who sets up laptops in five minutes".',
     'HR: Team building next month: an escape room. The developers want to automate the puzzles.',
   ),
-  // Pod 6: finance
+  // North-east: finance
   finance1: R(
-    'Finance: We manage our own invoices in <company>. Asset management too. Did you know your laptop already has an asset tag?',
+    'Finance: Did you know your laptop already has an asset tag? Everything here has one. Even the stapler.',
     'Finance: Every laptop is an asset, every asset has a lifecycle, every lifecycle ends in a spreadsheet. Here.',
   ),
   finance2: R(
@@ -359,7 +359,7 @@ Object.assign(TALK, {
     'Finance manager: Lovely weather, right? Reminds me of our cash flow: sunny, with a chance of cost review.',
     'Finance manager: Plans for the weekend? I am reconciling my holiday photos against the travel policy.',
   ),
-  // Side quest: a coffee for Pod 6 earns you the famous expense-refund spreadsheet.
+  // Side quest: a coffee for finance earns you the famous expense-refund spreadsheet.
   finance4: async (g) => {
     if (flags.coffeeQuest === 'done') return g.say(pick([
       'Finance: How is the spreadsheet treating you? Submit a refund, it lands in my inbox before you close the tab.',
@@ -372,7 +372,7 @@ Object.assign(TALK, {
       give(g, 'floor+sheet', 'Refund sheet');
       await g.say([
         'You got the EXPENSE REFUND SPREADSHEET!',
-        'Finance: Fully automated. Paste the receipt, it reads the amount, picks the cost centre, files the request in <company> and pings the approver.',
+        'Finance: Fully automated. Paste the receipt, it reads the amount, picks the cost centre, files the request in the expense system and pings the approver.',
         'Finance: Nicely done, if I say so myself. Not many people have access. Now you do. Do not tell HR.',
       ]);
       return;
@@ -384,7 +384,7 @@ Object.assign(TALK, {
   // Facility management
   facility2: R(
     'Facility: The restrooms have sensors now. Do not ask what they measure. Asset management asked the same.',
-    'Facility: Every chair, desk and plant on this floor is an asset in <company>. The ferns have serial numbers.',
+    'Facility: Every chair, desk and plant on this floor is in the inventory. The ferns have serial numbers.',
   ),
   facility3: async (g) => {
     if (flags.serverOpen) return g.say('Facility: Enjoy the hum. Touch nothing with a blinking light. Or without one.');
@@ -438,7 +438,7 @@ Object.assign(TALK, {
   ),
   southWalker: R('Tester: Found the bug. It was in the test. Classic.', 'Tester: Manager rooms are at the end. Knock twice, enter once, bring data.'),
   meeting2: R('Colleague: L3. Best view on the floor. Also the best meeting room.', 'Colleague: Reporting review. We are reporting on the reports. Meta-reporting. Very senior.'),
-  // Pods 2, 3 and 5
+  // South-wing desks
   pod2a: R('Developer: We sit right behind reception, so we always know who is visiting.', 'Developer: Our sprint goal: "the AI answers tickets before the customer finishes typing". We are at 40 percent.'),
   pod2c: R('Developer: I work on reporting. Every customer wants one more column. We are at column 212.', 'Developer: Dashboards are like plants. Somebody has to water them, or they die quietly.'),
   pod2d: R(
@@ -520,7 +520,7 @@ Object.assign(TALK, {
     'A sign on the cabinet: "Snacks are for everyone. Yes, that includes the people who sit closest."',
   ),
   facility1: R(
-    'Facility: The coffee machine reports its own incidents in <company> now. It filed three this morning. All about descaling.',
+    'Facility: The coffee machine files its own tickets now. It filed three this morning. All about descaling.',
     'Facility: No, there is no ice cream. Summer season only. I get asked this 40 times a day. Even in October.',
     'Facility: The snack cabinet is refilled on Mondays. By Monday afternoon it is a museum.',
   ),
@@ -576,7 +576,7 @@ Object.assign(TALK, {
     g.hooks.onKey('blip');
     await g.say(BUFFET[i][1]);
   },
-  otherLift: (g, o) => g.say(`Elevator ${o.label}. For the other tenants only: IBM, Turbine and friends. Your badge does nothing here.`),
+  otherLift: (g, o) => g.say(`Elevator ${o.label}. For the other tenants only: Helix Labs, Pixel Forge and friends. Your badge does nothing here.`),
   otherPanel: 'A call panel for floors 2 and 4 to 9. Floor 3 is not even on it. Rude.',
   otherGate: (g) => g.say(flags.badge
     ? ['You hold your QR badge to the reader... *BZZT* Red light.', 'ACCESS DENIED: wrong tenant. <company> lifts are on the west side, behind the security booth.']
@@ -590,7 +590,7 @@ Object.assign(TALK, {
   buffetSign: 'BÜFÉ - coffee, pastries, snacks. Card payment only.',
   courtyardDoor: (g) => g.say(['A big glass door to the inner courtyard garden. It is closed: yellow and black tape, and a sign.', '"CLOSED FOR CONSTRUCTION. We are making the garden even greener. Sorry for the noise!"', '*BRRRRRT* ...right on cue.']),
   grumpy: R(...NOISE.map((l) => 'Developer: ' + l), 'Developer: I came down for a quiet coffee. The courtyard had other plans.'),
-  visitor: R('Visitor: I am here for a demo. Service management, they said.', 'Visitor: Do you work here? ...oh, first day. Then we are both lost.', 'Visitor: Is that drilling part of the demo? Very immersive.'),
+  visitor: R('Visitor: I am here for a demo. Something with dashboards, they said.', 'Visitor: Do you work here? ...oh, first day. Then we are both lost.', 'Visitor: Is that drilling part of the demo? Very immersive.'),
   guard2: R('Guard 2 (behind the glass): *sips coffee* ...first days, huh. The desk is round the front.', 'Guard 2: The courtyard? Closed. Construction. I have heard that drill for three weeks. I hear it in my sleep.'),
   // Only speaks Hungarian. Translations: good day, sorry, no English / careful, construction, the entrance is
   // that way / we drill Monday to Friday, sorry for the noise / coffee? no thanks, I already had three.
@@ -618,7 +618,7 @@ Object.assign(TALK, {
     'Manager: So! Settling in? Lunch plans? Long-term career goals? Okay, too soon, let us parking-lot that.',
     ...NOISE.map((l) => 'Manager: ' + l),
   ),
-  pod2b: R('Tester: We test the self-service portal. If you can break it, lunch is on me.', 'Tester: Accessibility first. Even the error messages are polite here.', 'Tester: I wrote a test that fails whenever the courtyard drill starts. It is the most reliable test we have.'),
+  pod2b: R('Tester: We test the customer portal. If you can break it, lunch is on me.', 'Tester: Accessibility first. Even the error messages are polite here.', 'Tester: I wrote a test that fails whenever the courtyard drill starts. It is the most reliable test we have.'),
 });
 
 // ---- M2: booked all day ----
@@ -636,12 +636,12 @@ Object.assign(TALK, {
 
 // Local tips from the bench smoker on the street.
 const LOCAL = [
-  'The metro stop is called Klinikák because of the Semmelweis University clinics all around. Half the street wears scrubs.',
-  'Corvin Plaza is two minutes away: shops, a food court, and a cinema upstairs.',
-  'The Füvészkert botanical garden is round the corner. Oldest in Hungary, and much quieter than this building site.',
-  'This whole area was rebuilt as the Corvin Promenade. Twenty years ago it was all crumbling old courtyards.',
-  'Corvin köz and the Corvin cinema are just over there. 1956, history on every corner.',
-  'Ferenc körút is a short walk west: trams 4 and 6, all night long.',
+  'The metro is two minutes away. Learn the timetable, the last train leaves earlier than you think.',
+  'There is a shopping centre round the corner: shops, a food court, and a cinema upstairs.',
+  'There is a little park behind the next block. Much quieter than this building site.',
+  'This whole area was rebuilt a few years ago. It used to be crumbling old courtyards.',
+  'The best lángos is at the market hall. Go early, the queue is part of the experience.',
+  'Trams 4 and 6 on the Grand Boulevard run all night long.',
 ];
 
 // ---- West wing: the dev teams (fictional, for the playtest edition) ----
@@ -685,7 +685,7 @@ const TEAMS = {
   ],
   pixel: [
     'Designer: Team Pixel: the design system. Every button, colour and spacing you see comes from us.',
-    'Designer: Brand blue is not just a blue. It is THE blue. Please never put #0000FF in a merge request.',
+    'Designer: Our blue is not just a blue. It is THE blue. Please never put #0000FF in a merge request.',
     'Designer: Other teams build features, we build the bricks. If two buttons look different, someone skipped Pixel.',
   ],
 };
@@ -703,9 +703,9 @@ Object.assign(TALK, {
   ),
   meeting: R('Product owner: I came all the way from headquarters for this planning. The flight was shorter than our backlog refinement.', 'Product owner: My roadmap has three lanes: now, next, and "after we finally fix that one bug".'),
   guest: R('Product manager: Team week is the best week. Everyone in one room, no video lag, real whiteboards.', 'Product manager: We are aligning the roadmap across all product teams. Aligning is a big word for "moving sticky notes".'),
-  product1: R('UX designer: Over from Belgium for team week. I have already drawn four user journeys on the window.', 'UX designer: Customer interviews say one thing loud and clear: fewer clicks. We are counting every click this week.'),
-  product2: R('Architect: I am here from the Netherlands to keep everyone honest about dependencies. That makes me very popular.', 'Architect: Every plan looks great until someone asks "and who owns that API?". That is my job.'),
-  product3: R('Product owner: Germany, reporting for duty. We brought chocolate, the Budapest team brought pogácsa. Diplomacy works.', 'Product owner: Our sprint goal for the quarter fits on one sticky note. A very small font, but one sticky note.'),
+  product1: R('UX designer: Over from another office for team week. I have already drawn four user journeys on the window.', 'UX designer: Customer interviews say one thing loud and clear: fewer clicks. We are counting every click this week.'),
+  product2: R('Architect: I flew in to keep everyone honest about dependencies. That makes me very popular.', 'Architect: Every plan looks great until someone asks "and who owns that API?". That is my job.'),
+  product3: R('Product owner: Reporting for duty from abroad. We brought chocolate, the Budapest team brought pogácsa. Diplomacy works.', 'Product owner: Our sprint goal for the quarter fits on one sticky note. A very small font, but one sticky note.'),
   product4: R('Product owner: Flew in this morning. Our support colleagues already use AI every day, so I am here to make sure the roadmap keeps up.', 'Product owner: Big room planning is like Tetris: every team brings a piece, and the lines only clear if they fit.'),
   product5: R('Product manager: Team week means we finally put faces to the Teams avatars. You look exactly like your profile picture, by the way.', 'Product manager: Tonight is the team dinner. Lángos was voted down, again. Democracy is hard.'),
   product6: R('Product owner: Budapest is hosting this time, so I only had to walk from the west wing. Lucky me.', 'Product owner: We vote on priorities with dot stickers. I have three left and twelve favourite features.'),
@@ -716,9 +716,9 @@ const BUDAPEST_FACTS = [
   // Budapest
   'The M1 metro under Andrássy út opened in 1896. It is the oldest underground line on the European mainland.',
   'Budapest was born in 1873, when Buda, Óbuda and Pest merged into one city.',
-  'Corvin köz, right around the corner, was a centre of the 1956 revolution. The Corvin cinema is still there.',
+  'Budapest was the centre of the 1956 revolution. Some buildings still show the bullet marks.',
   'The city sits on more than a hundred thermal springs. Széchenyi is one of the biggest bath complexes in Europe.',
-  'The M3 line you came on runs north-south for about 17 kilometres. Klinikák is one of its stops.',
+  'The M3 metro line runs north-south for about 17 kilometres, the longest line in the city.',
   'The Chain Bridge opened in 1849. It was the first permanent bridge across the Danube in Budapest.',
   'The Parliament building is the largest building in Hungary. It was finished in 1904.',
   'Margaret Island has almost no car traffic, and a running track of about 5 kilometres goes all the way around it.',
@@ -737,7 +737,7 @@ const BUDAPEST_FACTS = [
   'The Danube flows through ten countries and four capitals: Vienna, Bratislava, Budapest and Belgrade.',
   'Formula 1 has raced at the Hungaroring near Budapest since 1986, the first Grand Prix behind the Iron Curtain.',
   'The national stadium is named after Ferenc Puskás, one of the greatest footballers ever.',
-  'The Semmelweis University clinics all around here are named after Ignác Semmelweis, who pushed doctors to wash their hands.',
+  'Semmelweis University is named after Ignác Semmelweis, who pushed doctors to wash their hands.',
   // People
   'The Rubik\'s Cube was invented in Budapest, in 1974, by Ernő Rubik.',
   'László Bíró, the inventor of the ballpoint pen, was born in Budapest.',
@@ -923,7 +923,7 @@ export function useItem(item, g) {
 }
 
 // ---- HR pickup and onboarding training ----
-// After check-in an HR colleague walks over from Pod 7, finds you wherever you are on the floor and leads
+// After check-in an HR colleague walks over from the north desks, finds you wherever you are on the floor and leads
 // you to S2 (the training room, south of the IT room), leaving a golden trail. Talking to them there starts the training; IT waits for it.
 const S2_SPOT = [41, 51]; // in S2, next to its table
 export const timing = { hrPickup: 7000 }; // ms of floor time before HR sets off; tests set it to 0
@@ -968,8 +968,8 @@ export async function hrPickup(g) {
 const QUIZ = [
   ['An email says "Your password expires today, click here". What do you do?', ['Report it as phishing', 'Click it, quickly', 'Forward it to the team'], 0,
     'Exactly. Report it with the button in Outlook. Security loves you already.', 'Hmm, no. That one is phishing: report it with the button in Outlook.'],
-  ['Your desk chair is broken. Where do you report it?', ['In <company>, of course', 'Shout across the office', 'Fix it with tape'], 0,
-    'Of course! We eat our own dog food. Facility gets it right away.', 'Close, but we have a tool for that. It is literally our product: <company>.'],
+  ['Your desk chair is broken. Where do you report it?', ['Log a ticket', 'Shout across the office', 'Fix it with tape'], 0,
+    'Exactly. Log a ticket and Facility gets it right away.', 'Close, but there is a ticket system for that. Facility gets it right away.'],
   ['You find a USB stick in the kitchen. What now?', ['Hand it to IT', 'Plug it in to see whose it is', 'Keep it, free storage'], 0,
     'Perfect. Never plug in unknown sticks. IT will deal with it.', 'Please never plug in unknown sticks! Hand it to IT instead.'],
 ];

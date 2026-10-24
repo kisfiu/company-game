@@ -14,7 +14,7 @@ export const LEGEND = {
 };
 
 // ---- small maps, hand drawn ------------------------------------------------
-// Street: the U-shaped Corvin Innovation Campus seen from above, open to Szigony utca,
+// Street: the U-shaped office building seen from above, open to the street,
 // inner garden in the courtyard, a single entrance in the base of the U.
 const streetRows = (() => {
   const W = 40, wing = (mid) => 'F'.repeat(9) + mid + 'F'.repeat(9);
@@ -165,12 +165,12 @@ const office = {
     { id: 'facilitator', x: 78, y: 21, look: 'coffee', dir: 'left' },
     { id: 'meeting2', x: 72, y: 28, look: 'chat', dir: 'down' },
     { id: 'it', x: 49, y: 37, look: 'it', dir: 'down' }, // at the end of the laptop counter,
-    // Pod 8: DevEx and three recruiters; the two lower seats on the right stay free for you
+    // North-west desks: DevEx and three recruiters; the two lower seats on the right stay free for you
     { id: 'devex', x: 42, y: 2, look: 'devex', dir: 'right', frenzy: true },
     { id: 'recruiter1', x: 42, y: 3, look: 'recruiter', dir: 'right' },
     { id: 'recruiter2', x: 42, y: 4, look: 'recruiter2', dir: 'right' },
     { id: 'recruiter3', x: 45, y: 2, look: 'recruiter3', dir: 'left' },
-    // Pod 7: developers and HR; Pod 6: finance
+    // North desks: developers and HR, then finance
     { id: 'pod7', x: 50, y: 2, look: 'dev', dir: 'right' },
     { id: 'hr1', x: 53, y: 3, look: 'hr', dir: 'left' },
     { id: 'hr2', x: 50, y: 4, look: 'hr', dir: 'right' },
@@ -198,7 +198,7 @@ const office = {
     { id: 'terrace2', x: 34, y: 38, look: 'manager', dir: 'up' },
     { id: 'sofa', x: 32, y: 20, look: 'tester', dir: 'left' },
     { id: 'reader', x: 36, y: 23, look: 'hr', dir: 'up' },
-    // Pod 2: developers behind the reception
+    // Desks behind the reception: developers
     { id: 'pod2a', x: 59, y: 35, look: 'dev', dir: 'down' },
     { id: 'pod2b', x: 61, y: 35, look: 'tester', dir: 'down' },
     { id: 'pod2c', x: 60, y: 44, look: 'dev', dir: 'up' },
