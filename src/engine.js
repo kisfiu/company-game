@@ -184,7 +184,8 @@ export class Game {
     const d = this.dialog, cur = d.pages[d.page].join('\n');
     if (d.shown < cur.length) d.shown += 2;
     for (const k of this.pressed.splice(0)) {
-      if (k !== 'A' && k !== 'B') continue;
+      if (k === 'up') { if (d.page > 0) { d.page--; d.shown = Infinity; this.hooks.onKey?.('blip'); } continue; } // back a page, shown at once
+      if (k !== 'A' && k !== 'B' && k !== 'down') continue;
       this.hooks.onKey?.('blip');
       if (d.shown < cur.length) { d.shown = cur.length; continue; }
       if (++d.page >= d.pages.length) { this.dialog = null; d.res(); return; }

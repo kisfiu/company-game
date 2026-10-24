@@ -838,12 +838,12 @@ Object.assign(TALK, {
 });
 
 // ---- The facility manager: roams the floor putting things back; her to-do list opens the server room ----
-export const FIXER_ROUTE = [[56, 13], [46, 12], [46, 30], [33, 34], [52, 48], [58, 30]];
+export const FIXER_ROUTE = [[56, 13], [46, 12], [46, 30], [33, 33], [52, 48], [58, 30]];
 const FM_TASKS = [
   { tile: 'pave+cup', find: 'a dirty mug on the terrace', fix: 'You carry the mug back to the kitchen and put it in the dishwasher.' },
   { tile: 'floor+chair', find: 'a meeting-room chair in the west corridor', fix: 'You roll the chair back into M2. Wait, M2 is booked. You leave it politely by the door.' },
   { tile: 'floor+plant', find: 'a plant somebody moved into the men\'s restroom', fix: 'You carry the plant back out to the corridor. It looks relieved.' },
-  { tile: 'chill+books', find: 'a book from the reception shelf, abandoned in the chill room', fix: 'You put the book back on the reception shelf. Chapter 3, by the bookmark.' },
+  { tile: 'chill+book', find: 'a book from the reception shelf, abandoned in the chill room', fix: 'You put the book back on the reception shelf. Chapter 3, by the bookmark.' },
   { tile: 'kitchen+laptopBlack', find: 'a forgotten laptop on a kitchen table', fix: 'You bring the laptop to IT for the lost and found. Its owner will be very grateful.' },
 ];
 let roaming = false;
@@ -956,7 +956,7 @@ export async function hrPickup(g) {
     await g.say([`HR: *panting* ${chase} seconds! Were you running away from me?`, 'HR: Twelve years in HR. Nobody escapes onboarding. Nobody.']);
   }
   await g.say([
-    `HR: There you are, ${flags.name}! I am your HR buddy. Sorry it took a while, the courtyard drill ate my calendar.`,
+    `HR: There you are, ${flags.name}! I am your HR buddy. Sorry it took a while, my previous meeting ran over.`,
     'HR: Before IT gives you a laptop, we do your onboarding training. Follow me to S2, the training room: south, past the IT room. Just follow the golden sparkles!',
   ]);
   flags.hr = 'leading';

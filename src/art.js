@@ -5,7 +5,7 @@ export const PAL = {
   L: '#E3F6FB', l: '#A9E6F4', c: '#3EB1CC', b: '#0A7DA0', B: '#054B64',
   y: '#FFD134', g: '#48BF86', o: '#F9A35C', r: '#E65038', R: '#C24530',
   G: '#8A8F94', d: '#C9CDD1', D: '#5B6166', A: '#4A4D52',
-  s: '#F2D3B3', h: '#5A3A1E', n: '#A8763E', N: '#6E4A22', t: '#2E7D4F', e: '#CFC3A8', p: '#D7C7E8',
+  s: '#F2D3B3', h: '#5A3A1E', n: '#A8763E', N: '#6E4A22', t: '#2E7D4F', e: '#CFC3A8', p: '#D7C7E8', f: '#F1EDE4', // f: off-white (restroom doors)
 };
 export const TILE = 16;
 
@@ -21,7 +21,7 @@ const G8 = {
   pinball:  ['.rrrrrr.','.ryyyyr.','.ryKKyr.','.ryyyyr.','.rwwwwr.','.rwbbwr.','.rrrrrr.','.k....k.'],
   locker:   ['GGGGGGGG','GddGddGG','GddGddGG','GdkGdkGG','GddGddGG','GddGddGG','GddGddGG','GGGGGGGG'],
   board:    ['dddddddd','dwwwwwwd','dwbbwbwd','dwwwwwwd','dwbwbbwd','dwwwwwwd','dddddddd','...dd...'],
-  table:    ['........','.nnnnnn.','.nNNNNn.','.nNNNNn.','.nnnnnn.','.n....n.','.n....n.','........'],
+  table:    ['........','nnnnnnnn','NNNNNNNN','NNNNNNNN','nnnnnnnn','.n....n.','.n....n.','........'], // edge to edge: tables side by side join up
   sign:     ['.bbbbbb.','.bwwwwb.','.bwbbwb.','.bwwwwb.','.bbbbbb.','...kk...','...kk...','...kk...'],
   tree:     ['...tt...','..tgtt..','.tggttg.','.tgtgtt.','..tttt..','...nn...','...nn...','...nn...'],
   bench:    ['........','........','nnnnnnnn','nNNNNNNn','n......n','n......n','........','........'],
@@ -50,6 +50,8 @@ const G8 = {
   redlight: ['........','..kkkk..','.krrrrk.','.krwrrk.','.krrrrk.','..kkkk..','........','........'],
   water:    ['..llll..','..lccl..','..llll..','.dddddd.','.dwwwwd.','.dkddkd.','.dddddd.','.d....d.'],
   gateRed:  ['...cl...','...cl...','..kkl...','..krl...','...cl...','...cl...','...cl...','...cl...'],
+  stall:    ['GGGGGGGG','GddddddG','GddddddG','GddddgdG','GddddddG','GddddddG','GGGGGGGG','........'], // toilet stall door, green = free
+  book:     ['........','........','.Rrrrrr.','.Rryyrr.','.Rrrrrr.','.Rrrrrr.','.wwwwww.','........'], // one book, lying down
   books:    ['nnnnnnnn','nrbgyrcn','nrbgyrcn','nnnnnnnn','nbyrcgbn','nbyrcgbn','nnnnnnnn','n......n'],
   cup:      ['..w.w...','.w.w.w..','........','.wwwwwww','.wwwwwww','.wwwww..','..wwww..','..dddd..'],
   sheet:    ['wwwwwwww','wggggggw','wgwgwgww','wggggggw','wgwgwgww','wggggggw','wgwgwgww','wwwwwwww'],
@@ -68,6 +70,10 @@ const BASE = {
   wall:   (c) => { fill(c, 'B'); c.fillStyle = PAL.b; c.fillRect(0, 0, 16, 4); c.fillStyle = PAL.c; c.fillRect(0, 0, 16, 1); },
   glass:  (c) => { fill(c, 'l'); c.fillStyle = PAL.w; c.fillRect(2, 0, 2, 16); c.fillRect(9, 0, 1, 16); },
   door:   (c) => { fill(c, 'n'); c.fillStyle = PAL.N; c.fillRect(0, 0, 1, 16); c.fillRect(15, 0, 1, 16); c.fillStyle = PAL.y; c.fillRect(11, 8, 2, 2); },
+  // Terrace door: framed, with a push bar and a threshold, so it stands out from the glass wall around it.
+  tdoor:  (c) => { fill(c, 'l'); c.fillStyle = PAL.B; c.fillRect(0, 0, 16, 2); c.fillRect(0, 0, 2, 16); c.fillRect(14, 0, 2, 16); c.fillStyle = PAL.w; c.fillRect(4, 3, 1, 4); c.fillRect(5, 3, 1, 2); c.fillStyle = PAL.k; c.fillRect(3, 8, 10, 2); c.fillStyle = PAL.y; c.fillRect(4, 8, 8, 1); c.fillStyle = PAL.G; c.fillRect(0, 15, 16, 1); },
+  // Restroom door: a plain off-white door with two panels and a handle, walkable.
+  rdoor:  (c) => { fill(c, 'f'); c.fillStyle = PAL.B; c.fillRect(0, 0, 16, 1); c.fillRect(0, 0, 1, 16); c.fillRect(15, 0, 1, 16); c.fillStyle = PAL.e; c.fillRect(3, 3, 10, 4); c.fillRect(3, 9, 10, 4); c.fillStyle = PAL.f; c.fillRect(4, 4, 8, 2); c.fillRect(4, 10, 8, 2); c.fillStyle = PAL.G; c.fillRect(12, 8, 2, 1); },
   gdoor:  (c) => { fill(c, 'l'); c.fillStyle = PAL.b; c.fillRect(0, 0, 1, 16); c.fillRect(15, 0, 1, 16); c.fillRect(7, 0, 2, 16); c.fillStyle = PAL.w; c.fillRect(2, 0, 2, 16); },
   lift:   (c) => { fill(c, 'G'); c.fillStyle = PAL.d; c.fillRect(1, 1, 6, 14); c.fillRect(9, 1, 6, 14); c.fillStyle = PAL.k; c.fillRect(7, 1, 2, 14); },
   liftOpen:(c) => { fill(c, 'G'); c.fillStyle = PAL.K; c.fillRect(2, 1, 12, 14); c.fillStyle = PAL.y; c.fillRect(6, 4, 4, 2); },

@@ -3,7 +3,7 @@ import { OFFICE, OFFICE_PLATES } from './office-map.js';
 const T = (t, solid) => ({ t, solid: !!solid });
 export const LEGEND = {
   ' ': T('black', 1), '.': T('floor'), 'k': T('kitchen'), 'c': T('chill'),
-  '#': T('wall', 1), '=': T('glass', 1), 'g': T('gdoor'), 'E': T('lift', 1), 'e': T('liftOpen'), // an open lift: walk in to ride
+  '#': T('wall', 1), '=': T('glass', 1), 'g': T('gdoor'), 'D': T('tdoor'), 'x': T('rdoor'), 'y': T('floor+stall'), 'E': T('lift', 1), 'e': T('liftOpen'), // an open lift: walk in to ride
   'r': T('road'), '-': T('street'), '_': T('pave'), '"': T('grass'), 'F': T('facade', 1), 'f': T('facadeTop', 1), 'G': T('ground', 1), '~': T('water', 1),
   'd': T('floor+desk', 1), 'm': T('floor+monitor', 1), 'h': T('floor+chair'), 'p': T('floor+plant', 1), 'L': T('floor+locker', 1),
   'W': T('floor+board', 1), 'n': T('floor+panel', 1), 'v': T('floor+server', 1), 'q': T('floor+recdesk', 1),
@@ -187,7 +187,7 @@ const office = {
     { id: 'coffee2', x: 43, y: 31, look: 'coffee', dir: 'left', wander: 1 },
     { id: 'facility1', x: 41, y: 31, look: 'facility', dir: 'right' },
     { id: 'chat1', x: 30, y: 27, look: 'chat', dir: 'up' },
-    { id: 'chat2', x: 34, y: 31, look: 'dev', dir: 'up' },
+    { id: 'chat2', x: 35, y: 31, look: 'dev', dir: 'up' },
     { id: 'chat3', x: 40, y: 27, look: 'tester', dir: 'down' },
     { id: 'lunch1', x: 30, y: 33, look: 'coffee', dir: 'right' },
     { id: 'lunch2', x: 36, y: 29, look: 'dev', dir: 'down' },
