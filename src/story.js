@@ -996,12 +996,12 @@ async function training(g) {
   await g.say([
     'HR: And this is for you: your real <company> badge, photo and all. The temporary QR one comes back to me.',
     `You got your BADGE! It says ${flags.name}, and it opens both doors of the lift lobby on this floor.`,
-    'HR: Now you are officially ready for a laptop. IT is south of reception, the storage room under the elevators.',
+    'HR: Now you are officially ready for a laptop. Go up from here: IT is on your right, just before the kitchen.',
   ]);
 }
 Object.assign(TALK, {
   hrGuide: (g) => {
-    if (flags.trained) return g.say('HR: Training done! IT is waiting for you: south of reception, the storage room under the elevators.');
+    if (flags.trained) return g.say('HR: Training done! IT is waiting for you: go up from here, it is on your right, just before the kitchen.');
     if (flags.hr !== 'waiting') return g.say('HR: This way! Follow me to S2, the training room. Follow the golden sparkles!');
     return training(g);
   },
