@@ -1,4 +1,4 @@
-import { Game, TOUCH } from './engine.js';
+import { Game, TOUCH, stickDir } from './engine.js';
 import { MAPS } from './maps.js';
 import { talk, onStep, onMap, useItem, mark, flags } from './story.js';
 import * as music from './music.js';
@@ -18,6 +18,28 @@ for (const b of document.querySelectorAll('#pad [data-key]')) {
   const up = () => { b.classList.remove('down'); game.release(k); };
   for (const ev of ['pointerup', 'pointercancel', 'lostpointercapture']) b.addEventListener(ev, up);
   b.addEventListener('contextmenu', (e) => e.preventDefault());
+}
+// Joystick: the knob follows the thumb (clamped to the base); the direction it points at is held like a key.
+// Turning the thumb switches keys at once; letting go releases it and the knob springs back.
+const stick = document.querySelector('#pad .stick');
+if (stick) {
+  const knob = stick.querySelector('.knob');
+  let held = null, finger = null;
+  const hold = (dir) => { if (dir === held) return; if (held) game.release(held); held = dir; if (dir) game.press(dir); };
+  const move = (e) => {
+    const r = stick.getBoundingClientRect(), max = r.width / 2 - 24;
+    let dx = e.clientX - (r.left + r.width / 2), dy = e.clientY - (r.top + r.height / 2);
+    const d = Math.hypot(dx, dy); if (d > max) { dx *= max / d; dy *= max / d; }
+    knob.style.transform = `translate(${dx}px, ${dy}px)`;
+    hold(stickDir(dx, dy, r.width * 0.12));
+  };
+  stick.addEventListener('pointerdown', (e) => {
+    e.preventDefault(); finger = e.pointerId; stick.classList.add('active'); move(e);
+    try { stick.setPointerCapture(finger); } catch { /* pointer already gone */ }
+  });
+  stick.addEventListener('pointermove', (e) => { if (e.pointerId === finger) move(e); });
+  const end = (e) => { if (e.pointerId !== finger) return; finger = null; stick.classList.remove('active'); knob.style.transform = ''; hold(null); };
+  for (const ev of ['pointerup', 'pointercancel', 'lostpointercapture']) stick.addEventListener(ev, end);
 }
 
 

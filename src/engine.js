@@ -19,6 +19,11 @@ export const cleanName = (s) => partialName(s).trim();
 const keyOf = (e) => KEYMAP[e.key?.length === 1 ? e.key.toLowerCase() : e.code];
 const FONT = '13px "Press Start 2P", monospace';
 // A phone or tablet: index.html shows the on-screen pad, and hints talk about tapping instead of keys.
+// Joystick drag (pixels from the centre) to one of the four walking directions, or null inside the dead zone.
+export function stickDir(dx, dy, dead) {
+  if (Math.hypot(dx, dy) < dead) return null;
+  return Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'right' : 'left') : (dy > 0 ? 'down' : 'up');
+}
 export const TOUCH = typeof matchMedia === 'function' && matchMedia('(pointer: coarse)').matches;
 // Press Start 2P has no ő ű Ő Ű: take the body of ó ú Ó Ú and draw its accent twice, side by side.
 const ACUTE = { 'ő': 'ó', 'ű': 'ú', 'Ő': 'Ó', 'Ű': 'Ú' };
