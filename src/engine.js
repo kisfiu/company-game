@@ -18,6 +18,8 @@ const partialName = (s) => graphemes(graphemes(s.normalize('NFC')).filter(nameCh
 export const cleanName = (s) => partialName(s).trim();
 const keyOf = (e) => KEYMAP[e.key?.length === 1 ? e.key.toLowerCase() : e.code];
 const FONT = '13px "Press Start 2P", monospace';
+// A phone or tablet: index.html shows the on-screen pad, and hints talk about tapping instead of keys.
+export const TOUCH = typeof matchMedia === 'function' && matchMedia('(pointer: coarse)').matches;
 // Press Start 2P has no ő ű Ő Ű: take the body of ó ú Ó Ú and draw its accent twice, side by side.
 const ACUTE = { 'ő': 'ó', 'ű': 'ú', 'Ő': 'Ó', 'Ű': 'Ú' };
 function pixelText(ctx, s, x, y) {
@@ -46,13 +48,20 @@ export class Game {
     addEventListener('keydown', (e) => {
       if (this.entry) { this.entryKey(e); return; }
       const k = keyOf(e); if (!k) return; e.preventDefault();
-      if (!e.repeat) { this.pressed.push(k); hooks.onKey?.(k); }
-      this.keys.add(k);
+      if (e.repeat) this.keys.add(k); else this.press(k);
     });
-    addEventListener('keyup', (e) => { const k = keyOf(e); if (k) this.keys.delete(k); });
+    addEventListener('keyup', (e) => { const k = keyOf(e); if (k) this.release(k); });
     addEventListener('blur', () => this.keys.clear());
     addEventListener('paste', (e) => { if (!this.entry || e.target === this.textInput) return; e.preventDefault(); this.entryAdd(e.clipboardData?.getData('text') || ''); });
   }
+
+  // The one way input gets in: keyboard and the on-screen touch pad both come through here. `pressed` holds
+  // one-shot presses for this frame, `keys` what is held down (walking reads it).
+  press(k) {
+    if (this.entry) { if (k === 'A') this.entryConfirm(); return; } // the A button confirms a typed name
+    this.pressed.push(k); this.hooks.onKey?.(k); this.keys.add(k);
+  }
+  release(k) { this.keys.delete(k); }
 
   start() { let last = 0; const loop = (t) => { if (t - last >= 15) { last = t; this.update(); this.draw(); } requestAnimationFrame(loop); }; requestAnimationFrame(loop); }
 
@@ -209,7 +218,7 @@ export class Game {
     const take = () => { if (this.entry && ta.value) this.entryAdd(ta.value); ta.value = ''; };
     ta.addEventListener('input', (e) => { if (!e.isComposing) take(); });
     ta.addEventListener('compositionend', take);
-    this.canvas.addEventListener('pointerdown', () => { if (this.entry) setTimeout(() => ta.focus()); });
+    this.canvas.addEventListener('pointerdown', (e) => { if (this.entry) { e.preventDefault(); ta.focus(); } }); // in the tap itself, or iOS keeps its keyboard closed
     return ta;
   }
   entryKey(e) {
@@ -218,12 +227,16 @@ export class Game {
     // Ctrl+Alt, used for $ * > ; ß on Hungarian keyboards) is typing, not a shortcut.
     if (e.isComposing) return;
     if (e.key === 'Tab') { e.preventDefault(); return; }
-    if (e.key === 'Enter' || e.code === 'NumpadEnter') { e.preventDefault(); this.entry = null; this.textInput?.blur(); this.hooks.onKey?.('blip'); en.res(cleanName(en.text) || en.fallback); return; }
+    if (e.key === 'Enter' || e.code === 'NumpadEnter') { e.preventDefault(); this.entryConfirm(); return; }
     if (e.key === 'Backspace') { e.preventDefault(); en.text = graphemes(en.text).slice(0, -1).join(''); return; }
     if ((e.ctrlKey || e.metaKey) && !e.altKey && !e.getModifierState?.('AltGraph')) return;
     if (this.textInput && document.activeElement === this.textInput) return; // the hidden field receives the text
     e.preventDefault(); // fallback when the field lost focus: take the key directly
     if (e.key?.length >= 1 && graphemes(e.key).length === 1) this.entryAdd(e.key);
+  }
+  entryConfirm() {
+    const en = this.entry; if (!en) return;
+    this.entry = null; this.textInput?.blur(); this.hooks.onKey?.('blip'); en.res(cleanName(en.text) || en.fallback);
   }
   entryAdd(text) { this.entry.text = partialName(this.entry.text + text); }
   drawEntry() {
@@ -236,7 +249,7 @@ export class Game {
     const cursor = Math.floor(performance.now() / 400) % 2 ? '_' : ' ';
     pixelText(ctx, en.text + cursor, 96, H / 2 - 9);
     ctx.font = '10px "Press Start 2P", monospace'; ctx.fillStyle = '#5B6166';
-    ctx.fillText('Type your name · Backspace deletes · Enter confirms', 84, H / 2 + 40); // pasting emojis is an easter egg, so no hint
+    ctx.fillText(TOUCH ? 'Tap here to type · A confirms' : 'Type your name · Backspace deletes · Enter confirms', 84, H / 2 + 40); // pasting emojis is an easter egg, so no hint
   }
   // Choice menu; `prompt` stays visible in the dialog box while choosing.
   choose(options, prompt) { return new Promise((res) => { this.menu = { options, i: 0, res, prompt }; }); }
