@@ -19,10 +19,14 @@ export const cleanName = (s) => partialName(s).trim();
 const keyOf = (e) => KEYMAP[e.key?.length === 1 ? e.key.toLowerCase() : e.code];
 const FONT = '13px "Press Start 2P", monospace';
 // A phone or tablet: index.html shows the on-screen pad, and hints talk about tapping instead of keys.
-// Joystick drag (pixels from the centre) to one of the four walking directions, or null inside the dead zone.
-export function stickDir(dx, dy, dead) {
-  if (Math.hypot(dx, dy) < dead) return null;
-  return Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'right' : 'left') : (dy > 0 ? 'down' : 'up');
+// Joystick drag (pixels from the centre) to the keys to hold: eight directions, so one or two keys ([] inside the
+// dead zone). Within 22.5 degrees of an axis it is straight, otherwise diagonal (two keys).
+export function stickDirs(dx, dy, dead) {
+  if (Math.hypot(dx, dy) < dead) return [];
+  const t = Math.tan(Math.PI / 8), keys = [];
+  if (Math.abs(dy) > Math.abs(dx) * t) keys.push(dy > 0 ? 'down' : 'up');
+  if (Math.abs(dx) > Math.abs(dy) * t) keys.push(dx > 0 ? 'right' : 'left');
+  return keys;
 }
 export const TOUCH = typeof matchMedia === 'function' && matchMedia('(pointer: coarse)').matches;
 // Press Start 2P has no ő ű Ő Ű: take the body of ó ú Ó Ú and draw its accent twice, side by side.
@@ -98,7 +102,22 @@ export class Game {
     e.dir = dir;
     const [dx, dy] = DIRS[dir];
     if (!this.walkable(e.x + dx, e.y + dy, e)) return false;
-    e.x += dx; e.y += dy; e.ox = -dx * TILE; e.oy = -dy * TILE; return true;
+    return this.moveBy(e, dx, dy);
+  }
+  moveBy(e, dx, dy) { e.x += dx; e.y += dy; e.ox = -dx * TILE; e.oy = -dy * TILE; e.step = [dx, dy]; return true; }
+  // Held arrows (keyboard or joystick) make one step: two at once go diagonally. A diagonal never squeezes past a
+  // corner (both side tiles must be free too); when it can't go, the player slides along the axis that is free.
+  // Sprites only face four ways, so a diagonal faces sideways.
+  stepPlayer(p) {
+    const dx = this.keys.has('right') - this.keys.has('left'), dy = this.keys.has('down') - this.keys.has('up');
+    const h = dx > 0 ? 'right' : 'left', v = dy > 0 ? 'down' : 'up';
+    if (dx && dy) {
+      p.dir = h;
+      if (this.walkable(p.x + dx, p.y, p) && this.walkable(p.x, p.y + dy, p) && this.walkable(p.x + dx, p.y + dy, p)) return this.moveBy(p, dx, dy);
+      return this.tryMove(p, h) || this.tryMove(p, v);
+    }
+    if (dx || dy) return this.tryMove(p, dx ? h : v);
+    return false;
   }
   tween(e) {
     if (!e.ox && !e.oy) return false;
@@ -128,8 +147,7 @@ export class Game {
       if (this.scripted) return this.tweenNpcs();
       if (pressed.includes('A')) this.interact();
       else {
-        const dir = ['up', 'down', 'left', 'right'].find((d) => this.keys.has(d));
-        if (dir) this.tryMove(p, dir);
+        this.stepPlayer(p);
       }
     } else if (!p.ox && !p.oy) {
       this.trail = this.trail.filter((t) => t.m !== this.map || Math.abs(t.x - p.x) > 1 || Math.abs(t.y - p.y) > 1); // footprints next to you (or under you) fade
@@ -171,7 +189,7 @@ export class Game {
   }
 
   async warp(w) {
-    if (w.when) { const r = w.when(); if (r !== true) { this.player.x -= DIRS[this.player.dir][0]; this.player.y -= DIRS[this.player.dir][1]; if (typeof r === 'string') await this.say(r); return; } }
+    if (w.when) { const r = w.when(); if (r !== true) { const [bx, by] = this.player.step || DIRS[this.player.dir]; this.player.x -= bx; this.player.y -= by; if (typeof r === 'string') await this.say(r); return; } }
     await this.fade(true);
     this.loadMap(w.to, w.tx, w.ty, w.dir);
     await this.fade(false);

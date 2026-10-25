@@ -1,4 +1,4 @@
-import { Game, TOUCH, stickDir } from './engine.js';
+import { Game, TOUCH, stickDirs } from './engine.js';
 import { MAPS } from './maps.js';
 import { talk, onStep, onMap, useItem, mark, flags } from './story.js';
 import * as music from './music.js';
@@ -19,26 +19,30 @@ for (const b of document.querySelectorAll('#pad [data-key]')) {
   for (const ev of ['pointerup', 'pointercancel', 'lostpointercapture']) b.addEventListener(ev, up);
   b.addEventListener('contextmenu', (e) => e.preventDefault());
 }
-// Joystick: the knob follows the thumb (clamped to the base); the direction it points at is held like a key.
-// Turning the thumb switches keys at once; letting go releases it and the knob springs back.
+// Joystick: the knob follows the thumb (clamped to the base); the direction it points at is held like arrow keys,
+// two at once for a diagonal. Turning the thumb switches keys at once; letting go releases them, the knob springs back.
 const stick = document.querySelector('#pad .stick');
 if (stick) {
   const knob = stick.querySelector('.knob');
-  let held = null, finger = null;
-  const hold = (dir) => { if (dir === held) return; if (held) game.release(held); held = dir; if (dir) game.press(dir); };
+  let held = [], finger = null;
+  const hold = (keys) => {
+    for (const k of held) if (!keys.includes(k)) game.release(k);
+    for (const k of keys) if (!held.includes(k)) game.press(k);
+    held = keys;
+  };
   const move = (e) => {
     const r = stick.getBoundingClientRect(), max = r.width / 2 - 24;
     let dx = e.clientX - (r.left + r.width / 2), dy = e.clientY - (r.top + r.height / 2);
     const d = Math.hypot(dx, dy); if (d > max) { dx *= max / d; dy *= max / d; }
     knob.style.transform = `translate(${dx}px, ${dy}px)`;
-    hold(stickDir(dx, dy, r.width * 0.12));
+    hold(stickDirs(dx, dy, r.width * 0.12));
   };
   stick.addEventListener('pointerdown', (e) => {
     e.preventDefault(); finger = e.pointerId; stick.classList.add('active'); move(e);
     try { stick.setPointerCapture(finger); } catch { /* pointer already gone */ }
   });
   stick.addEventListener('pointermove', (e) => { if (e.pointerId === finger) move(e); });
-  const end = (e) => { if (e.pointerId !== finger) return; finger = null; stick.classList.remove('active'); knob.style.transform = ''; hold(null); };
+  const end = (e) => { if (e.pointerId !== finger) return; finger = null; stick.classList.remove('active'); knob.style.transform = ''; hold([]); };
   for (const ev of ['pointerup', 'pointercancel', 'lostpointercapture']) stick.addEventListener(ev, end);
 }
 

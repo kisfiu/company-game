@@ -19,14 +19,14 @@ browsers block ES modules on `file://`.
 
 | Key | Action |
 |---|---|
-| Arrows / WASD | move |
+| Arrows / WASD | move; two at once (e.g. up + left) go diagonally |
 | Space / Enter | talk, confirm |
 | X / Esc | next line |
 | I | items |
 | Tab | map |
 | M | music on/off |
 
-On a phone or tablet an on-screen pad appears: a joystick to walk (drag and hold), **A** to talk and confirm (also your
+On a phone or tablet an on-screen pad appears: a joystick to walk in eight directions (drag and hold), **A** to talk and confirm (also your
 name), **B** back, and ITEMS, MAP and MUSIC buttons. Portrait and landscape both work. Tap the name box
 to bring up the keyboard.
 
