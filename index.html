@@ -62,6 +62,17 @@
     <div class="ab"><button data-key="B" aria-label="B, back">B</button><button data-key="A" aria-label="A, talk and confirm">A</button></div>
   </div>
 </div>
-<script type="module" src="src/main.js"></script>
+<script>
+  // Cache-busting without a build step. Static hosts (GitHub Pages: max-age=600) let a phone keep old scripts
+  // for a while; a new page with old modules breaks the game. Every module URL gets this page's own
+  // Last-Modified time as ?v=, so one release always loads one release. Keep MODULES in sync with src/ (a test checks).
+  const MODULES = ['main', 'engine', 'maps', 'story', 'music', 'art', 'office-map', 'quiz'];
+  const v = encodeURIComponent(document.lastModified);
+  const map = document.createElement('script');
+  map.type = 'importmap';
+  map.textContent = JSON.stringify({ imports: Object.fromEntries(MODULES.map((m) => [`./src/${m}.js`, `./src/${m}.js?v=${v}`])) });
+  document.currentScript.after(map);
+</script>
+<script type="module">import './src/main.js';</script>
 </body>
 </html>
