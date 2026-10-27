@@ -73,9 +73,12 @@ export function blip(name) {
   for (const [type, gain, seq] of BLIPS[name]) { t = ctx.currentTime; for (const [f, d] of seq) { tone(type, gain, f, t, d); t += d; } }
 }
 // Music waits for the player: the first key only unlocks audio for sound effects, M starts and stops the music.
+// A touch pointerdown is not a user gesture for audio, so the context can start suspended; resume() inside a
+// pointerup/keydown fixes that (main.js calls unlock on pointerup).
+export function unlock() { if (!ctx) init(); if (ctx.state !== 'running') ctx.resume().catch(() => {}); }
 let musicOn = false;
 export function onKey(k) {
-  if (!ctx) init();
+  unlock();
   if (k === 'M') { musicOn = !musicOn; if (musicOn) play(want); else song = null; }
   else if (SONGS[k]) { want = k; if (musicOn) play(k); }
   else blip(k);

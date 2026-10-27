@@ -1,6 +1,8 @@
 import { tile, person, OUTFITS, TILE } from './art.js';
 
 const SCALE = 3, VW = 240, VH = 160, STEP = 2; // 16px per 8 frames, FireRed walking pace
+const STEP_MS = 1000 / 60; // one update; the loop runs this many per second on every screen
+const GRACE = 350; // ms after a name box or menu opens during which A/Enter is ignored (a mashed key must not pick for you)
 export const DIRS = { up: [0, -1], down: [0, 1], left: [-1, 0], right: [1, 0] };
 // Letters match the printed key (e.key), so QWERTZ/AZERTY layouts work; other keys match the physical code.
 // Confirm is Space or Enter only. Key* codes stay for synthetic events without a key.
@@ -72,7 +74,17 @@ export class Game {
   }
   release(k) { this.keys.delete(k); }
 
-  start() { let last = 0; const loop = (t) => { if (t - last >= 15) { last = t; this.update(); this.draw(); } requestAnimationFrame(loop); }; requestAnimationFrame(loop); }
+  // Fixed 60 updates/s whatever the screen's refresh rate (90 Hz phones used to run at 45 updates/s); a hidden tab catches up by at most 100 ms.
+  start() {
+    let last = 0, acc = 0;
+    const loop = (t) => {
+      acc = Math.min(acc + (t - last), 100); last = t;
+      let n = 0; while (acc >= STEP_MS) { this.update(); acc -= STEP_MS; n++; }
+      if (n) this.draw();
+      requestAnimationFrame(loop);
+    };
+    requestAnimationFrame(loop);
+  }
 
   loadMap(name, x, y, dir) {
     const m = this.maps[name]; if (!m) throw new Error('no map ' + name);
@@ -163,11 +175,16 @@ export class Game {
       n.frame = n.frenzy ? Math.floor(performance.now() / 90) % 2 : 0; // frantic typing
       if (!n.wander || this.dialog || this.busy) continue;
       if (--n.wait > 0) continue;
-      n.wait = 60 + Math.random() * 180;
-      const dir = Object.keys(DIRS)[Math.floor(Math.random() * 4)];
-      const [dx, dy] = DIRS[dir];
-      if (Math.abs(n.x + dx - n.home[0]) <= n.wander && Math.abs(n.y + dy - n.home[1]) <= n.wander) this.tryMove(n, dir); else n.dir = dir;
+      this.wanderStep(n);
     }
+  }
+  // One idle step of a wandering colleague. They never stop right next to another NPC (diagonals too): two
+  // people side by side, or one diagonally behind the other, close a two-wide corridor for the player.
+  wanderStep(n, dir = Object.keys(DIRS)[Math.floor(Math.random() * 4)]) {
+    const crowded = (x, y) => this.map.npcs.some((o) => o !== n && Math.abs(o.x - x) <= 1 && Math.abs(o.y - y) <= 1);
+    const [dx, dy] = DIRS[dir], x = n.x + dx, y = n.y + dy;
+    if (Math.abs(x - n.home[0]) <= n.wander && Math.abs(y - n.home[1]) <= n.wander && !crowded(x, y)) this.tryMove(n, dir); else n.dir = dir;
+    n.wait = crowded(n.x, n.y) ? 20 + Math.random() * 40 : 60 + Math.random() * 180; // next to someone: move on soon
   }
 
   interact() {
@@ -231,12 +248,13 @@ export class Game {
     this.keys.clear();
     const ta = this.textInput || this.makeTextInput();
     ta.value = ''; ta.focus();
-    return new Promise((res) => { this.entry = { prompt, text: '', fallback, res }; });
+    return new Promise((res) => { this.entry = { prompt, text: '', fallback, res, at: performance.now() }; });
   }
   makeTextInput() {
     const ta = this.textInput = document.createElement('textarea');
     ta.setAttribute('aria-label', 'Your name'); ta.autocomplete = 'off'; ta.spellcheck = false;
-    ta.style.cssText = 'position:fixed;left:-1000px;top:0;width:10px;height:10px;opacity:0';
+    ta.style.cssText = 'position:fixed;left:0;top:0;width:10px;height:10px;opacity:0;font-size:16px'; // 16px: iOS zooms into smaller fields; on screen, or iOS pans towards it
+    ta.autocapitalize = 'off'; ta.setAttribute('autocorrect', 'off'); ta.enterKeyHint = 'done'; // the field is emptied after each character, so word-casing would capitalise every letter
     document.body.append(ta);
     const take = () => { if (this.entry && ta.value) this.entryAdd(ta.value); ta.value = ''; };
     ta.addEventListener('input', (e) => { if (!e.isComposing) take(); });
@@ -259,6 +277,7 @@ export class Game {
   }
   entryConfirm() {
     const en = this.entry; if (!en) return;
+    if (performance.now() - en.at < GRACE) return; // the press that closed the previous dialog must not confirm an empty name
     this.entry = null; this.textInput?.blur(); this.hooks.onKey?.('blip'); en.res(cleanName(en.text) || en.fallback);
   }
   entryAdd(text) { this.entry.text = partialName(this.entry.text + text); }
@@ -275,16 +294,18 @@ export class Game {
     ctx.fillText(TOUCH ? 'Tap here to type · A confirms' : 'Type your name · Backspace deletes · Enter confirms', 84, H / 2 + 40); // pasting emojis is an easter egg, so no hint
   }
   // Choice menu; `prompt` stays visible in the dialog box while choosing.
-  choose(options, prompt) { return new Promise((res) => { this.menu = { options, i: 0, res, prompt }; }); }
+  choose(options, prompt) { return new Promise((res) => { this.menu = { options, i: 0, res, prompt, at: performance.now() }; }); }
   addNpc(mapName, n) {
-    Object.assign(n, { ox: 0, oy: 0, frame: 0, wait: 0, home: [n.x, n.y] });
+    Object.assign(n, { ox: 0, oy: 0, frame: 0, wait: 0, home: [n.x, n.y], homeDir: n.dir });
     n.outfit ||= OUTFITS[n.look] || OUTFITS.dev;
     this.maps[mapName].npcs.push(n);
   }
   // Scripted walk for an NPC on map `m` to `to` ([x, y] or a function returning it, re-planned every step).
   // With `near`, stops next to the target. Pauses while the player is elsewhere or reading a dialog.
-  async walkNpc(m, n, to, { near = false, trail = false } = {}) {
+  // `stop.done = true` ends the walk at the next step (a caller that gave up waiting must not leave it running).
+  async walkNpc(m, n, to, { near = false, trail = false, stop = {} } = {}) {
     for (let tries = 0; tries < 3000;) {
+      if (stop.done) return;
       const [tx, ty] = typeof to === 'function' ? to() : to;
       const dist = Math.abs(n.x - tx) + Math.abs(n.y - ty);
       if (near ? dist <= 1 : dist === 0) return;
@@ -315,7 +336,7 @@ export class Game {
     for (const k of this.pressed.splice(0)) {
       if (k === 'up') m.i = (m.i + m.options.length - 1) % m.options.length;
       if (k === 'down') m.i = (m.i + 1) % m.options.length;
-      if (k === 'A') { this.menu = null; this.hooks.onKey?.('blip'); m.res(m.i); return; }
+      if (k === 'A') { if (performance.now() - m.at < GRACE) continue; this.menu = null; this.hooks.onKey?.('blip'); m.res(m.i); return; } // mashing A must not pick option 0
     }
   }
 
@@ -428,12 +449,19 @@ export class Game {
     n.spotted = true; n.alertUntil = performance.now() + 900; this.scripted = true; this.keys.clear();
     this.hooks.onKey?.('ding');
     await sleep(900);
+    if (n.walk) n.walk.done = true; // still on the way back from last time: that walk gives way
+    const stop = n.walk = {};
     // shortcut: if the way is blocked for 6 s they talk from where they are; fine for open corridors
-    await Promise.race([this.walkNpc(this.map, n, () => [this.player.x, this.player.y], { near: true }), sleep(6000)]);
+    await Promise.race([this.walkNpc(this.map, n, () => [this.player.x, this.player.y], { near: true, stop }), sleep(6000)]);
+    stop.done = true; // after the shortcut the walk must not go on and follow you into a doorway
     const face = (a, b) => (b.x > a.x ? 'right' : b.x < a.x ? 'left' : b.y > a.y ? 'down' : 'up');
     n.dir = face(n, this.player); this.player.dir = face(this.player, n);
     this.scripted = false;
-    this.hooks.talk(n, this);
+    await this.hooks.talk(n, this);
+    // Back to their post, facing the same way: a spotter must never stay in a doorway or a dead end.
+    const back = n.walk = {};
+    await this.walkNpc(this.map, n, n.home, { stop: back });
+    if (!back.done) n.dir = n.homeDir;
   }
   // "This is you": a pulsing golden ring and a bouncing arrow over the player, fading out at the end.
   highlightPlayer(ms = 1500) { this.spotlight = { until: performance.now() + ms }; }

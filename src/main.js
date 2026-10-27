@@ -19,6 +19,7 @@ for (const b of document.querySelectorAll('#pad [data-key]')) {
   for (const ev of ['pointerup', 'pointercancel', 'lostpointercapture']) b.addEventListener(ev, up);
   b.addEventListener('contextmenu', (e) => e.preventDefault());
 }
+document.addEventListener('pointerup', music.unlock); // the finger lifting is the gesture that lets audio start on phones
 // Joystick: the knob follows the thumb (clamped to the base); the direction it points at is held like arrow keys,
 // two at once for a diagonal. Turning the thumb switches keys at once; letting go releases them, the knob springs back.
 const stick = document.querySelector('#pad .stick');

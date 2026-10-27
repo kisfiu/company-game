@@ -1,5 +1,7 @@
 import { MAPS } from './maps.js';
-import { DIRS } from './engine.js';
+import { DIRS, TOUCH } from './engine.js';
+// Hints name the key the player actually has: Space on a keyboard, the A button on the touch pad.
+const SPACE = TOUCH ? 'A' : 'Space';
 import { TECH, NEWS, ask } from './quiz.js';
 
 export const flags = { badge: false, puzzle: false, buzzed: false, checkedIn: false, laptop: null, devex: false, provisioned: false, working: false, gate: false, hr: null, trained: false, coffeeQuest: null, coffee: false, cigarette: null, spare: false, localTold: [], fm: null, fmFixed: [], serverOpen: false, name: 'New Dev', start: 0 };
@@ -163,7 +165,7 @@ export const TALK = {
     await g.say([`${flags.name}: Hi! It is my first day at <company>.`, `Guard: Welcome, ${flags.name}! The new developer, of course. One second... *printer noises*`]);
     flags.badge = true;
     give(g, 'floor+qr', 'QR badge');
-    await g.say([`You got the QR BADGE! It says: ${flags.name}, <company>, 3rd floor.`, 'Guard: The lifts are behind me, to the left, past the rail. The rail has a glass gate with a QR reader: walk up to it and press Space to scan.']);
+    await g.say([`You got the QR BADGE! It says: ${flags.name}, <company>, 3rd floor.`, `Guard: The lifts are behind me, to the left, past the rail. The rail has a glass gate with a QR reader: walk up to it and press ${SPACE} to scan.`]);
   },
   guard1: (g) => TALK.securityDesk(g),
   gate: async (g) => {
@@ -199,7 +201,7 @@ Object.assign(TALK, {
     await g.say([
       'A call panel with nine floor buttons. To call a lift you must repeat a short code.',
       'HOW IT WORKS: the panel lights up 4 buttons, one after another. Remember the order.',
-      'Then it is your turn: move the red frame with the ARROW keys and press Space on the buttons in the same order.',
+      `Then it is your turn: move the red frame with the ${TOUCH ? 'joystick' : 'ARROW keys'} and press ${SPACE} on the buttons in the same order.`,
       'The last button is always 3, your floor. Get one wrong and it simply shows the code again.',
     ]);
     g.hooks.onKey('puzzle');
@@ -230,7 +232,7 @@ Object.assign(TALK, {
   receptionDesk: async (g) => {
     if (flags.provisioned) return random('Receptionist: All set? You look like someone who has a working laptop now.', 'Receptionist: The kitchen fruit is free. The pogácsa goes fast.', 'Receptionist: Meeting rooms: L is large, S is small and M is... medium? Nobody remembers.')(g);
     if (flags.checkedIn && !flags.trained) return g.say(flags.hr === 'waiting' ? 'Receptionist: HR is waiting for you in S2, the training room. South, past the IT room.' : 'Receptionist: HR is on the way to pick you up. Have a look around, they will find you!');
-    if (flags.checkedIn) return random('Receptionist: IT is south of here, the storage room right under the elevators. After that, DevEx!', 'Receptionist: Lost? Press Tab, there is a map. Just kidding. Well, actually, try it.', 'Receptionist: Your badge works on the lockers too, pick any free one.')(g);
+    if (flags.checkedIn) return random('Receptionist: IT is south of here, the storage room right under the elevators. After that, DevEx!', `Receptionist: Lost? Press ${TOUCH ? 'MAP' : 'Tab'}, there is a map. Just kidding. Well, actually, try it.`, 'Receptionist: Your badge works on the lockers too, pick any free one.')(g);
     await g.say('Receptionist: Hi, welcome to <company>!');
     const i = await g.choose(['New developer', 'Pizza delivery'], 'Receptionist: And who are you? Why are you here today?');
     if (i === 1) await g.say(['Receptionist: ...with no pizza?', `${flags.name}: ...`, `Receptionist: Wait a second. The guards just called up about a new developer. You must be ${flags.name}!`]);
@@ -247,7 +249,7 @@ Object.assign(TALK, {
     if (!flags.trained) return g.say('IT: Training first, laptop second. HR will pick you up for your onboarding training. Rules are rules!');
     await g.say([`IT: ${flags.name}, the new developer! Pick your weapon. Choose wisely, you only get one.`, 'Three laptops on the desk: a shiny silver MacBook, a black Linux ThinkPad and a blue Windows one.']);
     const i = await g.choose([...LAPTOPS, 'Let me look first'], 'IT: Which one will it be?');
-    if (i === LAPTOPS.length) return g.say('IT: Sure, take a look. Face a laptop on the desk and press Space to inspect it.');
+    if (i === LAPTOPS.length) return g.say(`IT: Sure, take a look. Face a laptop on the desk and press ${SPACE} to inspect it.`);
     return pickLaptop(g, i);
   },
   laptop: async (g, o) => {
@@ -303,7 +305,13 @@ Object.assign(TALK, {
     flags.coffee = true;
     give(g, 'floor+cup', 'Coffee');
   },
-  server: 'The server room hums behind the wall. Blinking lights. Do not touch.',
+  // The four racks, left to right, once the facility manager has let you in. Something is running. Nobody says what.
+  server: (g, o) => g.say([
+    ['Rack 1. A sticky note on the door: "DO NOT POWER CYCLE. It is thinking."', 'The fans spin up a little as you read it.'],
+    ['Rack 2. A terminal, still logged in. One line on the screen: "Step 7 of 9. Estimated time remaining: soon."', 'It has said "soon" since Tuesday. Nobody knows which Tuesday.'],
+    ['Rack 3. Taped across the handle: "Started at 03:14. Do not open before it is done. You will know when."', 'No name. No date. The tape is yellow with age.'],
+    ['Rack 4. Every light blinks in the same slow rhythm, like breathing.', 'A label in careful handwriting: "It is running. Come back when it is done. Not before."'],
+  ][o.x - 41] ?? 'A server rack. It hums. Something is running. You have to wait.'),
   board: 'A whiteboard. Half a sequence diagram and the words "ask DevEx".',
   coreLift: 'The elevator core. You already had your ride for today.',
   massageTable: 'The massage room. There is a waiting list until next quarter.',
@@ -467,8 +475,6 @@ Object.assign(TALK, {
     'Manager: Welcome aboard! Your 30-60-90 plan is in my drafts. Think of it as a living document. It is very much alive.',
   ),
   manager2: R(
-    'Manager: One-on-one in five minutes! Not you. Not yet.',
-    'Manager: I asked the AI assistant to write my performance reviews. HR asked me not to. The AI agreed with HR.',
     'Manager: Do we have bandwidth for this? Let us run a quick capacity check against the holistic resourcing matrix.',
     'Manager: I am not saying no. I am saying not now, in a way that sounds like yes, pending alignment.',
     'Manager: Let us put a pin in it, add it to the backlog of the backlog, and revisit at the next quarterly offsite.',
@@ -511,7 +517,7 @@ Object.assign(TALK, {
     'Salted peanuts: the snack you eat one of, and then forty more.',
     'A jar of mixed nuts: almonds, cashews, hazelnuts. The cashews are always gone first.',
     'You take a few vaníliás karika. Vanilla rings: the official fuel of code reviews.',
-    'Pilóta keksz! The jam-filled biscuit every Hungarian colleague grew up with. You take two. Okay, three.',
+    'Pilóta keksz! Two biscuits with chocolate cream in between, the one every Hungarian colleague grew up with. You take two. Okay, three.',
     'Mese keksz, the biscuit with fairy tale pictures. You read the story on yours before eating it.',
     'You grab a handful of ropi. Salty sticks, perfect for thinking about a bug.',
     'Chips or tortilla chips? You take both. It has been a long first day.',
@@ -787,7 +793,7 @@ function catPictures(g) {
         CAT.forEach((row, y) => [...row].forEach((c, x) => { if (pal[c]) { ctx.fillStyle = pal[c]; ctx.fillRect(x0 + x * S, y0 + y * S, S, S); } }));
         ctx.font = '11px "Press Start 2P", monospace'; ctx.fillStyle = '#3A3A3A'; ctx.textBaseline = 'top'; ctx.textAlign = 'center';
         wrapLines(caption, 34).forEach((l, n) => ctx.fillText(l, W / 2, y0 + 16 * S + 24 + n * 18));
-        ctx.fillStyle = '#E65038'; ctx.fillText(`${i + 1}/${CATS.length}   Space: next`, W / 2, H - 52);
+        ctx.fillStyle = '#E65038'; ctx.fillText(`${i + 1}/${CATS.length}   ${SPACE}: next`, W / 2, H - 52);
         ctx.textAlign = 'left';
       },
     };
@@ -880,8 +886,8 @@ Object.assign(TALK, {
       g.hud = g.hud.filter((h) => !h.text.startsWith('To-do')); g.hooks.onKey('solved');
       return g.say([
         'Facility: All five? You are a natural! Here is a little secret as a thank-you.',
-        'Facility: The server room: my colleague standing at its door has the key. Tell her I sent you and she will let you in.',
-        'Facility: And the IT storage room? Ask IT nicely. They have a key for everything, they just pretend they do not.',
+        'Facility: The server room: my colleague standing at its door has the key. She checks your badge and walks you in, no exceptions.',
+        'Facility: And the IT storage room? That one stays locked. IT only, badge or no badge.',
       ]);
     }
     await g.say(['Facility: Oh, hi! Sorry, busy busy. People keep putting things in the wrong place.', 'Facility: Mugs on the terrace, chairs in corridors, plants in the restroom. Every. Single. Day.']);
@@ -889,7 +895,7 @@ Object.assign(TALK, {
     flags.fm = 'active';
     MAPS.office.objects.filter((o) => o.id === 'misplaced').forEach((o) => { o.tile = FM_TASKS[o.task].tile; });
     g.hud.push({ tile: 'floor+board', text: `To-do 0/${FM_TASKS.length}` });
-    await g.say(['Facility: You are a lifesaver! Here is my list:', ...FM_TASKS.map((t) => `- ${t.find}`), 'Facility: Find them, walk over them or press Space next to them, then come and find me.']);
+    await g.say(['Facility: You are a lifesaver! Here is my list:', ...FM_TASKS.map((t) => `- ${t.find}`), `Facility: Find them, walk over them or press ${SPACE} next to them, then come and find me.`]);
   },
   misplaced: async (g, o) => {
     if (flags.fm !== 'active' || flags.fmFixed.includes(o.task)) return;
@@ -953,7 +959,7 @@ export async function hrPickup(g) {
   hr.dir = toward(hr, g.player); g.player.dir = toward(g.player, hr);
   if (fled >= 3) {
     flags.hrChase = chase;
-    await g.say([`HR: *panting* ${chase} seconds! Were you running away from me?`, 'HR: Twelve years in HR. Nobody escapes onboarding. Nobody.']);
+    await g.say([`HR: *panting* ${chase} seconds! Were you running away from me?`, 'HR: Nobody escapes onboarding. Nobody.']);
   }
   await g.say([
     `HR: There you are, ${flags.name}! I am your HR buddy. Sorry it took a while, my previous meeting ran over.`,
@@ -966,9 +972,9 @@ export async function hrPickup(g) {
 }
 
 const QUIZ = [
-  ['An email says "Your password expires today, click here". What do you do?', ['Report it as phishing', 'Click it, quickly', 'Forward it to the team'], 0,
+  ['An email says "Your password expires today, click here". What do you do?', ['Click it, quickly', 'Report it as phishing', 'Forward it to the team'], 1,
     'Exactly. Report it with the button in Outlook. Security loves you already.', 'Hmm, no. That one is phishing: report it with the button in Outlook.'],
-  ['Your desk chair is broken. Where do you report it?', ['Log a ticket', 'Shout across the office', 'Fix it with tape'], 0,
+  ['Your desk chair is broken. Where do you report it?', ['Shout across the office', 'Fix it with tape', 'Log a ticket'], 2,
     'Exactly. Log a ticket and Facility gets it right away.', 'Close, but there is a ticket system for that. Facility gets it right away.'],
   ['You find a USB stick in the kitchen. What now?', ['Hand it to IT', 'Plug it in to see whose it is', 'Keep it, free storage'], 0,
     'Perfect. Never plug in unknown sticks. IT will deal with it.', 'Please never plug in unknown sticks! Hand it to IT instead.'],
@@ -1043,7 +1049,7 @@ export async function onStep(g) {
         ctx.fillText(`Laptop: ${flags.laptop}`, W / 2, H / 2);
         ctx.fillText(`Time: ${Math.floor(secs / 60)}m ${secs % 60}s`, W / 2, H / 2 + 28);
         if (flags.hrChase) ctx.fillText(`Ran from HR for ${flags.hrChase}s`, W / 2, H / 2 + 54);
-        ctx.fillStyle = '#E65038'; ctx.fillText('Space: keep exploring   F5: start over', W / 2, H / 2 + 90);
+        ctx.fillStyle = '#E65038'; ctx.fillText(`${SPACE}: keep exploring   ${TOUCH ? 'Reload' : 'F5'}: start over`, W / 2, H / 2 + 90);
         ctx.textAlign = 'left'; ctx.textBaseline = 'top';
       },
     };
@@ -1090,9 +1096,9 @@ export function simon(g) {
         ctx.textBaseline = 'middle'; ctx.textAlign = 'center';
         ctx.font = '13px "Press Start 2P", monospace';
         const [title, hint, col] = {
-          ready: [wrong ? 'WRONG BUTTON!' : 'CALL PANEL', wrong ? 'Press Space to see the code again' : 'Press Space to show the code', wrong ? '#E65038' : '#054B64'],
+          ready: [wrong ? 'WRONG BUTTON!' : 'CALL PANEL', wrong ? `Press ${SPACE} to see the code again` : `Press ${SPACE} to show the code`, wrong ? '#E65038' : '#054B64'],
           show: ['WATCH...', `Remember the order (${Math.min(step + 1, seq.length)}/${seq.length})`, '#054B64'],
-          input: ['YOUR TURN', 'Arrows move the red frame, Space presses', '#48BF86'],
+          input: ['YOUR TURN', `${TOUCH ? 'Joystick moves' : 'Arrows move'} the red frame, ${SPACE} presses`, '#48BF86'],
         }[mode];
         ctx.fillStyle = col; ctx.fillText(title, W / 2, H / 2 - 145);
         ctx.font = '10px "Press Start 2P", monospace'; ctx.fillStyle = '#3A3A3A'; ctx.fillText(hint, W / 2, H / 2 - 120);

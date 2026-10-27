@@ -202,7 +202,7 @@ const office = {
     { id: 'pod2a', x: 59, y: 35, look: 'dev', dir: 'down' },
     { id: 'pod2b', x: 61, y: 35, look: 'tester', dir: 'down' },
     { id: 'pod2c', x: 60, y: 44, look: 'dev', dir: 'up' },
-    { id: 'pod2d', x: 58, y: 40, look: 'manager', dir: 'right', wander: 1 },
+    { id: 'pod2d', x: 57, y: 39, look: 'manager', dir: 'right', wander: 1 },
     // Too busy to talk: one walks around on the phone, one types like the building is on fire
     { id: 'phoneWalker', x: 47, y: 40, look: 'manager', dir: 'down', wander: 5, busy: true },
     { id: 'typer', x: 59, y: 41, look: 'dev', dir: 'down', busy: true, frenzy: true },
@@ -262,6 +262,6 @@ for (const m of Object.values(MAPS)) {
   m.legend = LEGEND;
   const w = Math.max(...m.rows.map((r) => r.length));
   m.rows = m.rows.map((r) => r.padEnd(w, ' '));
-  for (const n of m.npcs) n.home = [n.x, n.y];
+  for (const n of m.npcs) { n.home = [n.x, n.y]; n.homeDir = n.dir; } // where wanderers roam around, and where a spotter returns to
   for (const o of m.objects) if (o.id === 'sign' && !o.tile) o.solid = false;
 }
