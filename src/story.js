@@ -224,21 +224,21 @@ Object.assign(TALK, {
   bell: async (g) => {
     if (flags.buzzed) return g.say('*bzzzt* The door is already open.');
     g.hooks.onKey('ding');
-    await g.say(['*riiing*', 'Receptionist (through the intercom): Hi! New developer? Come in, the door is open!']);
+    await g.say(['*riiing*', 'Facility (through the intercom): Hi! New developer? Come in, the door is open!']);
     flags.buzzed = true;
   },
 
   // ---- office --------------------------------------------------------------
   receptionDesk: async (g) => {
-    if (flags.provisioned) return random('Receptionist: All set? You look like someone who has a working laptop now.', 'Receptionist: The kitchen fruit is free. The pogácsa goes fast.', 'Receptionist: Meeting rooms: L is large, S is small and M is... medium? Nobody remembers.')(g);
-    if (flags.checkedIn && !flags.trained) return g.say(flags.hr === 'waiting' ? 'Receptionist: HR is waiting for you in S2, the training room. South, past the IT room.' : 'Receptionist: HR is on the way to pick you up. Have a look around, they will find you!');
-    if (flags.checkedIn) return random('Receptionist: IT is south of here, the storage room right under the elevators. After that, DevEx!', `Receptionist: Lost? Press ${TOUCH ? 'MAP' : 'Tab'}, there is a map. Just kidding. Well, actually, try it.`, 'Receptionist: Your badge works on the lockers too, pick any free one.')(g);
-    await g.say('Receptionist: Hi, welcome to <company>!');
-    const i = await g.choose(['New developer', 'Pizza delivery'], 'Receptionist: And who are you? Why are you here today?');
-    if (i === 1) await g.say(['Receptionist: ...with no pizza?', `${flags.name}: ...`, `Receptionist: Wait a second. The guards just called up about a new developer. You must be ${flags.name}!`]);
-    else await g.say(`Receptionist: Of course! The guards just called up about you. You must be ${flags.name}!`);
+    if (flags.provisioned) return random('Facility: All set? You look like someone who has a working laptop now.', 'Facility: The kitchen fruit is free. The pogácsa goes fast.', 'Facility: Meeting rooms: L is large, S is small and M is... medium? Nobody remembers.')(g);
+    if (flags.checkedIn && !flags.trained) return g.say(flags.hr === 'waiting' ? 'Facility: HR is waiting for you in S2, the training room. South, past the IT room.' : 'Facility: HR is on the way to pick you up. Have a look around, they will find you!');
+    if (flags.checkedIn) return random('Facility: IT is south of here, the storage room right under the elevators. After that, DevEx!', `Facility: Lost? Press ${TOUCH ? 'MAP' : 'Tab'}, there is a map. Just kidding. Well, actually, try it.`, 'Facility: Your badge works on the lockers too, pick any free one.')(g);
+    await g.say('Facility: Hi, welcome to <company>!');
+    const i = await g.choose(['New developer', 'Pizza delivery'], 'Facility: And who are you? Why are you here today?');
+    if (i === 1) await g.say(['Facility: ...with no pizza?', `${flags.name}: ...`, `Facility: Wait a second. The guards just called up about a new developer. You must be ${flags.name}!`]);
+    else await g.say(`Facility: Of course! The guards just called up about you. You must be ${flags.name}!`);
     flags.checkedIn = true;
-    await g.say(['Receptionist: Signed in! I have let HR know you are here. They will come and pick you up for your onboarding training.', 'Receptionist: It might take a few minutes. Look around, grab a coffee in the kitchen, HR will find you.']);
+    await g.say(['Facility: Signed in! I have let HR know you are here. They will come and pick you up for your onboarding training.', 'Facility: It might take a few minutes. Look around, grab a coffee in the kitchen, HR will find you.']);
     hrPickup(g);
   },
   receptionist: (g) => TALK.receptionDesk(g),
@@ -389,18 +389,6 @@ Object.assign(TALK, {
     await g.say(['Finance: Hey, new one! Do me a favour? Bring me a coffee from the kitchen and I will give you something cool.', 'Finance: Something very cool. Finance cool. Trust me.']);
     flags.coffeeQuest = 'asked';
   },
-  // Facility management
-  facility2: R(
-    'Facility: The restrooms have sensors now. Do not ask what they measure. Asset management asked the same.',
-    'Facility: Every chair, desk and plant on this floor is in the inventory. The ferns have serial numbers.',
-  ),
-  facility3: async (g) => {
-    if (flags.serverOpen) return g.say('Facility: Enjoy the hum. Touch nothing with a blinking light. Or without one.');
-    if (flags.fm === 'done') { openServerRoom(g); return g.say(['Facility: My colleague told me you put the whole floor back in order. Respect.', '*click* Facility: The server room is open for you. Look, do not touch.']); }
-    return g.say(flags.provisioned
-      ? 'Facility: The server room? Locked. I have the key, but you will have to earn it. Ask my colleague with the to-do list, she always needs help.'
-      : 'Facility: Mind the door, it is the server room. Locked. Only a few people have the key. I am one of them. *jingles keys*');
-  },
   // Kitchen
   coffee1: R(
     'Developer: First coffee of the day. The build is red anyway.',
@@ -524,11 +512,6 @@ Object.assign(TALK, {
     'The healthy shelf: rice crackers, dried fruit, seeds. You look at it, nod respectfully, and take the chips.',
     'The sugar-free shelf. Somebody wrote "it still counts as a snack" on a sticky note.',
     'A sign on the cabinet: "Snacks are for everyone. Yes, that includes the people who sit closest."',
-  ),
-  facility1: R(
-    'Facility: The coffee machine files its own tickets now. It filed three this morning. All about descaling.',
-    'Facility: No, there is no ice cream. Summer season only. I get asked this 40 times a day. Even in October.',
-    'Facility: The snack cabinet is refilled on Mondays. By Monday afternoon it is a museum.',
   ),
   recruiter1: R(
     'Recruiter: We are hiring a Senior Software Engineer and an Engineering Manager, both here in Budapest. Know anyone? Referral bonus!',
@@ -884,9 +867,10 @@ Object.assign(TALK, {
       }
       flags.fm = 'done';
       g.hud = g.hud.filter((h) => !h.text.startsWith('To-do')); g.hooks.onKey('solved');
+      openServerRoom(g); // the thank-you: she unlocks it herself
       return g.say([
         'Facility: All five? You are a natural! Here is a little secret as a thank-you.',
-        'Facility: The server room: my colleague standing at its door has the key. She checks your badge and walks you in, no exceptions.',
+        '*click* Facility: I just unlocked the server room for you. West of the lift lobby. Look, do not touch.',
         'Facility: And the IT storage room? That one stays locked. IT only, badge or no badge.',
       ]);
     }

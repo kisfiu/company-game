@@ -151,13 +151,15 @@ export function person(dir, frame, pal) {
 export const OUTFITS = {
   player: { S: PAL.b, H: PAL.h, P: PAL.K },
   guard:  { S: PAL.K, H: PAL.k, P: PAL.K },
-  reception: { S: PAL.c, H: PAL.o, P: PAL.D, long: true },
   it:     { S: PAL.g, H: PAL.k, P: PAL.D },
   devex:  { S: '#141414', H: PAL.h, P: '#141414' }, // all black, always
   dev:    { S: PAL.D, H: PAL.h, P: PAL.K },
+  devF:   { S: PAL.D, H: PAL.o, P: PAL.K, long: true },
   tester: { S: PAL.y, H: PAL.k, P: PAL.D },
+  testerF: { S: PAL.y, H: PAL.N, P: PAL.D, long: true },
   finance:{ S: PAL.w, H: PAL.N, P: PAL.D },
   manager:{ S: PAL.B, H: PAL.G, P: PAL.k },
+  managerF: { S: PAL.B, H: PAL.N, P: PAL.k, long: true },
   coffee: { S: PAL.o, H: PAL.h, P: PAL.D },
   chat:   { S: PAL.p, H: PAL.y, P: PAL.D },
   street: { S: PAL.G, H: PAL.k, P: PAL.D },

@@ -148,11 +148,10 @@ const office = {
     { x: 48, y: 22, to: 'elevators3', tx: 1, ty: 2, dir: 'right' },
   ],
   npcs: [
-    { id: 'receptionist', x: 60, y: 32, look: 'reception', dir: 'up' },
+    { id: 'receptionist', x: 60, y: 32, look: 'facility', dir: 'up' },
     { id: 'intern', x: 62, y: 29, look: 'chat', dir: 'down', wander: 2 }, // away from the lift exit so it never boxes you in
     { id: 'hr3', x: 66, y: 31, look: 'hr', dir: 'left' },
     { id: 'eastWalker', x: 56, y: 20, look: 'manager', dir: 'down', wander: 1 },
-    { id: 'facility2', x: 57, y: 23, look: 'facility', dir: 'right' },
     { id: 'meeting', x: 70, y: 20, look: 'dev', dir: 'down' },
     { id: 'guest', x: 73, y: 22, look: 'manager', dir: 'up' },
     // L2: product team week, colleagues from all over the company
@@ -176,19 +175,17 @@ const office = {
     { id: 'hr2', x: 50, y: 4, look: 'hr', dir: 'right' },
     { id: 'finance1', x: 57, y: 2, look: 'finance', dir: 'right' },
     { id: 'finance2', x: 57, y: 3, look: 'finance', dir: 'right' },
-    { id: 'finance3', x: 60, y: 2, look: 'manager', dir: 'left' },
+    { id: 'finance3', x: 60, y: 2, look: 'managerF', dir: 'left' },
     { id: 'finance4', x: 60, y: 4, look: 'finance', dir: 'left' },
     { id: 'wanderer1', x: 47, y: 12, look: 'dev', dir: 'down', wander: 3 },
     { id: 'massage', x: 44, y: 9, look: 'coffee', dir: 'left' },
     { id: 'm2Caller', x: 44, y: 13, look: 'm2Caller', dir: 'left', busy: true }, // someone in M2 all day, behind a closed door
-    { id: 'facility3', x: 46, y: 22, look: 'facility', dir: 'up' },
     { id: 'fixer', x: 56, y: 13, look: 'fixer', dir: 'down' }, // roams the floor (see FIXER_ROUTE in story.js)
     { id: 'coffee1', x: 41, y: 29, look: 'coffee', dir: 'right' },
     { id: 'coffee2', x: 43, y: 31, look: 'coffee', dir: 'left', wander: 1 },
-    { id: 'facility1', x: 41, y: 31, look: 'facility', dir: 'right' },
     { id: 'chat1', x: 30, y: 27, look: 'chat', dir: 'up' },
     { id: 'chat2', x: 35, y: 31, look: 'dev', dir: 'up' },
-    { id: 'chat3', x: 40, y: 27, look: 'tester', dir: 'down' },
+    { id: 'chat3', x: 40, y: 27, look: 'testerF', dir: 'down' },
     { id: 'lunch1', x: 30, y: 33, look: 'coffee', dir: 'right' },
     { id: 'lunch2', x: 36, y: 29, look: 'dev', dir: 'down' },
     { id: 'lunch3', x: 37, y: 33, look: 'tester', dir: 'right' },
@@ -199,14 +196,14 @@ const office = {
     { id: 'sofa', x: 32, y: 20, look: 'tester', dir: 'left' },
     { id: 'reader', x: 36, y: 23, look: 'hr', dir: 'up' },
     // Desks behind the reception: developers
-    { id: 'pod2a', x: 59, y: 35, look: 'dev', dir: 'down' },
-    { id: 'pod2b', x: 61, y: 35, look: 'tester', dir: 'down' },
+    { id: 'pod2a', x: 59, y: 35, look: 'devF', dir: 'down' },
+    { id: 'pod2b', x: 61, y: 35, look: 'testerF', dir: 'down' },
     { id: 'pod2c', x: 60, y: 44, look: 'dev', dir: 'up' },
     { id: 'pod2d', x: 57, y: 39, look: 'manager', dir: 'right', wander: 1 },
     // Too busy to talk: one walks around on the phone, one types like the building is on fire
     { id: 'phoneWalker', x: 47, y: 40, look: 'manager', dir: 'down', wander: 5, busy: true },
     { id: 'typer', x: 59, y: 41, look: 'dev', dir: 'down', busy: true, frenzy: true },
-    { id: 'tester1', x: 40, y: 37, look: 'tester', dir: 'down' },
+    { id: 'tester1', x: 40, y: 37, look: 'testerF', dir: 'down' },
     { id: 'pod3c', x: 42, y: 37, look: 'dev', dir: 'down' },
     { id: 'dev1', x: 41, y: 46, look: 'dev', dir: 'up' },
     { id: 'tester2', x: 44, y: 43, look: 'tester', dir: 'up', wander: 1 },
