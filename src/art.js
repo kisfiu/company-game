@@ -137,10 +137,12 @@ export function person(dir, frame, pal) {
   const d = dir === 'left' ? 'right' : dir;
   if (dir === 'left') { ctx.translate(12, 0); ctx.scale(-1, 1); }
   paintGlyph(ctx, BODY[d][frame], 1, pal);
-  if (pal.long) { // shoulder-length hair: strands beside the face, or a full back of hair seen from behind
+  if (pal.long) { // long hair past the shoulders: the women of the office read as women at a glance
     ctx.fillStyle = pal.H;
-    const px = { down: [[2, 2], [2, 3], [2, 4], [2, 5], [9, 2], [9, 3], [9, 4], [9, 5]], up: [[3, 4], [4, 5], [5, 5], [6, 5], [7, 5], [8, 4], [2, 3], [9, 3]], right: [[2, 2], [2, 3], [2, 4], [2, 5], [3, 4], [3, 5], [4, 5]] }[d];
-    for (const [x, y] of px) ctx.fillRect(x, y, 1, 1);
+    const rect = (x, y, w, h) => ctx.fillRect(x, y, w, h);
+    if (d === 'down') { rect(2, 1, 1, 8); rect(9, 1, 1, 8); rect(3, 6, 1, 2); rect(8, 6, 1, 2); } // strands framing the face, over the shoulders
+    else if (d === 'up') { rect(2, 2, 1, 6); rect(9, 2, 1, 6); rect(3, 4, 6, 5); } // seen from behind: a full back of hair
+    else { rect(2, 2, 2, 7); rect(4, 5, 1, 3); } // side view: the hair falls down the back
   }
   cache.set(key, c);
   return c;
@@ -149,7 +151,7 @@ export function person(dir, frame, pal) {
 export const OUTFITS = {
   player: { S: PAL.b, H: PAL.h, P: PAL.K },
   guard:  { S: PAL.K, H: PAL.k, P: PAL.K },
-  reception: { S: PAL.c, H: PAL.o, P: PAL.D },
+  reception: { S: PAL.c, H: PAL.o, P: PAL.D, long: true },
   it:     { S: PAL.g, H: PAL.k, P: PAL.D },
   devex:  { S: '#141414', H: PAL.h, P: '#141414' }, // all black, always
   dev:    { S: PAL.D, H: PAL.h, P: PAL.K },
@@ -159,10 +161,10 @@ export const OUTFITS = {
   coffee: { S: PAL.o, H: PAL.h, P: PAL.D },
   chat:   { S: PAL.p, H: PAL.y, P: PAL.D },
   street: { S: PAL.G, H: PAL.k, P: PAL.D },
-  hr:     { S: PAL.R, H: PAL.N, P: PAL.D },
-  facility: { S: PAL.t, H: PAL.k, P: PAL.B },
+  hr:     { S: PAL.R, H: PAL.N, P: PAL.D, long: true },
+  facility: { S: PAL.t, H: PAL.k, P: PAL.B, long: true },
   fixer:  { S: PAL.t, H: PAL.y, P: PAL.B, long: true }, // the blonde facility manager who puts things back
-  recruiter: { S: PAL.p, H: PAL.o, P: PAL.k },
+  recruiter: { S: PAL.p, H: PAL.o, P: PAL.k, long: true },
   recruiter2: { S: PAL.g, H: PAL.h, P: PAL.B },
   recruiter3: { S: '#7B5CA8', H: PAL.y, P: PAL.D, long: true },
   m2Caller: { S: PAL.R, H: PAL.N, P: PAL.k, long: true },

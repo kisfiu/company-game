@@ -880,7 +880,7 @@ Object.assign(TALK, {
       g.hud = g.hud.filter((h) => !h.text.startsWith('To-do')); g.hooks.onKey('solved');
       return g.say([
         'Facility: All five? You are a natural! Here is a little secret as a thank-you.',
-        'Facility: The server room: my colleague standing at its door has the key. Tell him I sent you and he will let you in.',
+        'Facility: The server room: my colleague standing at its door has the key. Tell her I sent you and she will let you in.',
         'Facility: And the IT storage room? Ask IT nicely. They have a key for everything, they just pretend they do not.',
       ]);
     }
