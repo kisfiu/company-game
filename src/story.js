@@ -859,27 +859,27 @@ function openServerRoom(g) {
 }
 Object.assign(TALK, {
   fixer: async (g) => {
-    if (flags.fm === 'done') return g.say(pick(['Facility: Thanks again for the help! The floor has never looked this tidy. For about ten minutes.', 'Facility: If you see a chair where it should not be, you know who to call.']));
+    if (flags.fm === 'done') return g.say(pick(['Facility manager: Thanks again for the help! The floor has never looked this tidy. For about ten minutes.', 'Facility manager: If you see a chair where it should not be, you know who to call.']));
     if (flags.fm === 'active') {
       if (flags.fmFixed.length < FM_TASKS.length) {
         const left = FM_TASKS.filter((_, i) => !flags.fmFixed.includes(i)).map((t) => t.find);
-        return g.say([`Facility: ${left.length} to go! Still out there:`, ...left.map((t) => `- ${t}`)]);
+        return g.say([`Facility manager: ${left.length} to go! Still out there:`, ...left.map((t) => `- ${t}`)]);
       }
       flags.fm = 'done';
       g.hud = g.hud.filter((h) => !h.text.startsWith('To-do')); g.hooks.onKey('solved');
       openServerRoom(g); // the thank-you: she unlocks it herself
       return g.say([
-        'Facility: All five? You are a natural! Here is a little secret as a thank-you.',
-        '*click* Facility: I just unlocked the server room for you. West of the lift lobby. Look, do not touch.',
-        'Facility: And the IT storage room? That one stays locked. IT only, badge or no badge.',
+        'Facility manager: All five? You are a natural! Here is a little secret as a thank-you.',
+        '*click* Facility manager: I just unlocked the server room for you. West of the lift lobby. Look, do not touch.',
+        'Facility manager: And the IT storage room? That one stays locked. IT only, badge or no badge.',
       ]);
     }
-    await g.say(['Facility: Oh, hi! Sorry, busy busy. People keep putting things in the wrong place.', 'Facility: Mugs on the terrace, chairs in corridors, plants in the restroom. Every. Single. Day.']);
-    if (await g.choose(['I can help', 'Maybe later'], 'Facility: Want to help me put things back?') === 1) return g.say('Facility: No worries. I will be walking around, as always.');
+    await g.say(['Facility manager: Oh, hi! Sorry, busy busy. People keep putting things in the wrong place.', 'Facility manager: Mugs on the terrace, chairs in corridors, plants in the restroom. Every. Single. Day.']);
+    if (await g.choose(['I can help', 'Maybe later'], 'Facility manager: Want to help me put things back?') === 1) return g.say('Facility manager: No worries. I will be walking around, as always.');
     flags.fm = 'active';
     MAPS.office.objects.filter((o) => o.id === 'misplaced').forEach((o) => { o.tile = FM_TASKS[o.task].tile; });
     g.hud.push({ tile: 'floor+board', text: `To-do 0/${FM_TASKS.length}` });
-    await g.say(['Facility: You are a lifesaver! Here is my list:', ...FM_TASKS.map((t) => `- ${t.find}`), `Facility: Find them, walk over them or press ${SPACE} next to them, then come and find me.`]);
+    await g.say(['Facility manager: You are a lifesaver! Here is my list:', ...FM_TASKS.map((t) => `- ${t.find}`), `Facility manager: Find them, walk over them or press ${SPACE} next to them, then come and find me.`]);
   },
   misplaced: async (g, o) => {
     if (flags.fm !== 'active' || flags.fmFixed.includes(o.task)) return;
